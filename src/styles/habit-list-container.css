@@ -1,0 +1,20 @@
+.habit-list-card {
+    max-width: 40%;
+    margin: auto;
+  }
+  
+  .no-border {
+    border: none !important;
+  }
+  
+  @media (width <= 960px) {
+    .habit-list-card {
+      max-width: 50%;
+    }
+  }
+  
+  @media (width <= 600px) {
+    .habit-list-card {
+      max-width: 80%;
+    }
+  }

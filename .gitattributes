@@ -1,0 +1,11 @@
+
+*.vue linguist-language=Vue
+*.js linguist-language=JavaScript
+*.css linguist-language=CSS
+
+*.html linguist-language=Vue
+
+large-generated-file.html linguist-generated=true
+dist/** linguist-generated=true
+
+node_modules/** linguist-vendored
