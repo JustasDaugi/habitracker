@@ -1,14 +1,17 @@
 import { ref, watch } from 'vue'
 import { formatDateString, getTodayDate, isValidDate, isFutureDate } from '../../utils/date'
 
-export function useNavigation(selectedDay, onDateChange, onFutureDateAttempt) {
+export function useNavigation(selectedDayRef, onDateChange, onFutureDateAttempt) {
   const weekDays = ref([])
-  const weekStartDate = ref(new Date(selectedDay.value))
+  const weekStartDate = ref(new Date(selectedDayRef.value))
 
   const updateWeekDays = () => {
+    const startDate = new Date(weekStartDate.value)
+    startDate.setDate(startDate.getDate() - startDate.getDay())
+
     weekDays.value = Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(weekStartDate.value)
-      date.setDate(weekStartDate.value.getDate() + i)
+      const date = new Date(startDate)
+      date.setDate(startDate.getDate() + i)
       return {
         date: formatDateString(date),
         label: date.toLocaleDateString('en-US', {
@@ -41,41 +44,31 @@ export function useNavigation(selectedDay, onDateChange, onFutureDateAttempt) {
     updateWeekDays()
   }
 
-  watch(
-    () => selectedDay.value,
-    (newValue) => {
-      weekStartDate.value = new Date(newValue)
-      weekStartDate.value.setDate(weekStartDate.value.getDate() - weekStartDate.value.getDay())
-      updateWeekDays()
-    },
-    { immediate: true }
-  )
+  const updateWeek = (date) => {
+    const newDate = new Date(date)
+    newDate.setDate(newDate.getDate() - newDate.getDay())
+    weekStartDate.value = newDate
+    updateWeekDays()
+  }
+
+  watch(selectedDayRef, (newValue) => {
+    updateWeek(newValue)
+  }, { immediate: true })
 
   return {
     weekDays,
     weekStartDate,
     handleDateSelection,
     handleNavigateWeek,
-    updateWeekDays
+    updateWeekDays,
+    updateWeek
   }
 }
 
-/**
- * @param newDate
- * @returns {string}
- */
 export function handleRouteChange(newDate) {
   return newDate && isValidDate(newDate) ? newDate : getTodayDate()
 }
 
-/**
- * Updates the selected day, handling future dates and routing.
- * 
- * @param newDate - The new date to be set
- * @param selectedDay - Ref containing the currently selected date
- * @param router - Vue Router instance for navigation
- * @param showFutureDateMessage - Ref to control display of future date warning
- */
 export function updateSelectedDay(newDate, selectedDay, router, showFutureDateMessage) {
   const formattedNewDate = formatDateString(newDate)
   const today = getTodayDate()
