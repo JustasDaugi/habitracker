@@ -86,7 +86,8 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['habits-updated', 'categories-updated'])
+const emit = defineEmits(['habits-updated', 'categories-updated', 'date-changed'])
+
 
 const selectedDaysOfWeek = ref([])
 const showDatePicker = ref(false)
@@ -135,7 +136,9 @@ const updateSelectedDay = (date) => {
   selectedDay.value = newDate
   loadHabitsForDate(formatDateString(newDate))
   emit('habits-updated', formatDateString(newDate))
+  emit('date-changed', formatDateString(newDate))
 }
+
 
 const handleSaveHabit = () => {
   saveHabit(
