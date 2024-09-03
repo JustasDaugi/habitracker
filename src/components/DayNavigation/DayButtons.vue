@@ -4,10 +4,13 @@
       v-for="day in weekDays"
       :key="day.date + weekStartDate.toISOString()"
       :color="day.date === selectedDay ? 'selected-button' : 'default-button'"
-      :class="['date-button', 'white--text']"
+      class="date-button white--text"
       @click="handleDateSelected(day.date)"
     >
-      {{ formatDayLabel(day.label) }}
+      <div class="date-content">
+        <div class="date-top">{{ formatLabel(day.label, 'day') }}</div>
+        <div class="date-bottom">{{ formatLabel(day.label, 'month') }}</div>
+      </div>
     </v-btn>
   </div>
 </template>
@@ -23,22 +26,21 @@ defineProps({
 
 const emit = defineEmits(['date-selected'])
 
-function handleDateSelected(date) {
+const handleDateSelected = (date) => {
   emit('date-selected', date)
   window.dispatchEvent(new CustomEvent('vue:date-selected', { detail: date }))
 }
 
-function formatDayLabel(label) {
+const formatLabel = (label, type) => {
   const [weekday, monthAndDate] = label.split(', ')
-  const [, dateStr] = monthAndDate.split(' ')
-  const day = parseInt(dateStr, 10)
-
-  if (isNaN(day)) {
-    console.error(`Failed to parse date from label: ${label}`)
-    return label
+  const [month, dateStr] = monthAndDate.split(' ')
+  
+  if (type === 'day') {
+    const day = parseInt(dateStr, 10)
+    return isNaN(day) ? label : `${weekday.slice(0, 3)}, ${day}`
   }
-
-  return `${weekday.slice(0, 3)}, ${day}`
+  
+  return month.slice(0, 3)
 }
 </script>
 
@@ -53,16 +55,28 @@ function formatDayLabel(label) {
 .date-button {
   padding: 4px 8px;
   min-width: 70px;
-  height: 36px;
+  height: 50px;
   border-radius: 6px;
   text-transform: none;
   font-weight: normal;
   font-size: 0.75rem;
   line-height: 1.2;
   background: linear-gradient(to bottom, #C41E3A 0%, #9B1730 100%);
-  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   transition: background 0.3s ease;
 }
+
+.date-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.date-top { margin-bottom: 2px; }
+.date-bottom { font-size: 0.65rem; }
 
 .date-button:hover {
   background: linear-gradient(to bottom, #B51B35 0%, #8A152B 100%);
