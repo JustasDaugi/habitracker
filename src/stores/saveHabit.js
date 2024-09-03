@@ -46,32 +46,33 @@ export const saveHabit = (
   }
 
   const createNewHabitForMultipleDates = () => {
-    const newHabit = createNewHabit()
-    const numberOfDays = 365
-    const selectedDate = new Date(selectedDay)
-
-    const pastDates = getNextNDaysWithDayOfWeek(
-      new Date(selectedDate.getTime() - 365 * 24 * 60 * 60 * 1000),
-      numberOfDays
-    )
-    const presentDates = getNextNDaysWithDayOfWeek(selectedDate, numberOfDays)
+    const newHabit = createNewHabit();
+    const numberOfDays = 365;
+    const selectedDate = new Date(selectedDay);
+    selectedDate.setHours(0, 0, 0, 0); 
+  
     const futureDates = getNextNDaysWithDayOfWeek(
-      new Date(selectedDate.getTime() + 365 * 24 * 60 * 60 * 1000),
+      selectedDate,
       numberOfDays
-    )
-
-    const combinedDates = [...pastDates, ...presentDates, ...futureDates]
-
+    );
+  
     const datesToSave =
       selectedDaysOfWeek.length > 0
-        ? combinedDates.filter((date) => selectedDaysOfWeek.includes(date.dayOfWeek))
-        : combinedDates
-
+        ? futureDates.filter((date) => selectedDaysOfWeek.includes(date.dayOfWeek))
+        : futureDates;
+  
+    if (!datesToSave.some(d => d.date === selectedDay)) {
+      datesToSave.unshift({ date: selectedDay, dayOfWeek: selectedDate.getDay() });
+    }
+  
+    datesToSave.sort((a, b) => new Date(a.date) - new Date(b.date));
+  
     saveHabitForMultipleDates(
       datesToSave.map((d) => d.date),
       newHabit
-    )
-  }
+    );
+  };
+  
 
   try {
     editingHabit ? updateExistingHabit() : createNewHabitForMultipleDates()
