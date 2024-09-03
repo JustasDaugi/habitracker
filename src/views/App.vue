@@ -12,7 +12,10 @@
           @day-changed="handleDayChange"
           @show-future-date-message="showFutureDateMessage = true"
         />
-        <HabitListContainer :date="formatDateString(selectedDay)" />
+        <HabitListContainer 
+          :date="formatDateString(selectedDay)" 
+          @date-changed="handleDateChange"
+        />
       </v-container>
     </v-main>
     <v-snackbar v-model="showFutureDateMessage" color="error" timeout="3000">
@@ -39,6 +42,10 @@ const handleDayChange = (newDate) => {
   updateSelectedDay(dateValue, selectedDay, router, showFutureDateMessage)
 }
 
+const handleDateChange = (newDate) => {
+  selectedDay.value = new Date(newDate)
+}
+
 watch(
   () => route.params.date,
   (newDate) => {
@@ -50,6 +57,7 @@ watch(
   { immediate: true }
 )
 </script>
+
 
 <style scoped>
 .app {
