@@ -35,7 +35,11 @@ export const saveHabit = (
         ? futureDates.filter((date) => selectedDaysOfWeek.includes(date.dayOfWeek))
         : futureDates
 
-    if (!datesToSave.some((d) => d.date === selectedDay)) {
+    if (
+      selectedDaysOfWeek.length > 0 &&
+      selectedDaysOfWeek.includes(selectedDate.getDay()) &&
+      !datesToSave.some((d) => d.date === selectedDay)
+    ) {
       datesToSave.unshift({ date: selectedDay, dayOfWeek: selectedDate.getDay() })
     }
 
