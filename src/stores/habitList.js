@@ -16,15 +16,12 @@ export function useHabitList(initialDate) {
   const formattedSelectedDay = computed(() => formatDate(selectedDay.value))
   const isDateInFuture = computed(() => isFutureDate(selectedDay.value))
 
-  const getNumberOfDays = () => parseInt(selectedDays.value)
-  const getDatesToSave = () => getNextNDaysWithDayOfWeek(selectedDay.value, getNumberOfDays())
-
-  function loadHabitsForDate(date) {
+  const loadHabitsForDate = (date) => {
     selectedDay.value = date
     habits.value = loadHabits(date)
   }
 
-  function updateHabitCompletion(habit) {
+  const updateHabitCompletion = (habit) => {
     const index = habits.value.findIndex((h) => h.id === habit.id)
     if (index !== -1) {
       habits.value[index] = { ...habit }
@@ -32,22 +29,16 @@ export function useHabitList(initialDate) {
     }
   }
 
-  function deleteHabit(habit) {
+  const deleteHabit = (habit) => {
     deleteHabitFromAllDates(habit.name)
     loadHabitsForDate(selectedDay.value)
   }
 
-  function stopHabit(habit) {
-    const updatedHabits = habits.value.filter(h => h.id !== habit.id)
-    saveHabits(selectedDay.value, updatedHabits)
-    loadHabitsForDate(selectedDay.value)
+  const stopHabit = (habit) => {
+    habits.value = habits.value.filter((h) => h.id !== habit.id)
+    saveHabits(selectedDay.value, habits.value)
   }
 
-  /**
-   * Groups habits by their categories.
-   * If a habit doesn't have a category, it's placed in an "Uncategorized" group.
-   * @returns {Array} An array of category objects, each containing an array of habits.
-   */
   const groupedHabits = computed(() => {
     const groups = {}
     habits.value.forEach((habit) => {
@@ -57,7 +48,6 @@ export function useHabitList(initialDate) {
         color: '#9E9E9E',
         icon: 'mdi-help-circle-outline'
       }
-
       if (!groups[category.id]) {
         groups[category.id] = { ...category, habits: [] }
       }
@@ -82,8 +72,9 @@ export function useHabitList(initialDate) {
     deleteHabit,
     stopHabit,
     refreshCategories,
-    getNumberOfDays,
-    getDatesToSave,
+    getNumberOfDays: () => parseInt(selectedDays.value),
+    getDatesToSave: () =>
+      getNextNDaysWithDayOfWeek(selectedDay.value, parseInt(selectedDays.value)),
     ...dialogUtils
   }
 }
