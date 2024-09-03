@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useNavigation } from './dayNavigation'
 import WeekButtons from './WeekButtons.vue'
 import DayButtons from './DayButtons.vue'
@@ -29,14 +29,19 @@ const props = defineProps({
 
 const emit = defineEmits(['day-changed', 'show-future-date-message'])
 
-const { weekDays, weekStartDate, handleDateSelection, handleNavigateWeek } = useNavigation(
+const { weekDays, weekStartDate, handleDateSelection, handleNavigateWeek, updateWeek } = useNavigation(
   computed(() => new Date(props.selectedDay)),
   (date) => emit('day-changed', date),
   () => emit('show-future-date-message')
 )
 
 const handleFutureDateMessage = () => emit('show-future-date-message')
+
+watch(() => props.selectedDay, (newDate) => {
+  updateWeek(new Date(newDate))
+})
 </script>
+
 
 <style scoped>
 .day-navigation-container {
